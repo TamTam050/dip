@@ -1,0 +1,370 @@
+1.  Image Creation
+
+
+Code:
+
+import numpy as np  # Import NumPy for array manipulation
+import matplotlib.pyplot as plt  # Import Matplotlib for plotting
+
+# Create three 50x50 NumPy arrays filled with zeros, representing RGB channels
+a_channel = np.zeros((50, 50))
+b_channel = np.zeros((50, 50))
+c_channel = np.zeros((50, 50))
+
+# Set the left half of the first channel (Red) to 255 (white) for a vertical stripe
+a_channel[:, :16] = 255
+
+# Display the first channel (Red stripe) as a grayscale image
+plt.imshow(a_channel, cmap='Greys')  # Use 'Greys' colormap for grayscale
+plt.title("Channel A (Red Stripe)")
+plt.show()
+
+# Set the middle portion of the second channel (Green) to 255 (white) for a stripe
+b_channel[:, 16:32] = 255
+
+# Display the second channel (Green stripe) as a grayscale image
+plt.imshow(b_channel, cmap='Greys')
+plt.title("Channel B (Green Stripe)")
+plt.show()
+
+# Set the right half of the third channel (Blue) to 255 (white) for a stripe
+c_channel[:, 32:] = 255
+
+# Display the third channel (Blue stripe) as a grayscale image
+plt.imshow(c_channel, cmap='Greys')
+plt.title("Channel C (Blue Stripe)")
+plt.show()
+
+# Stack the three channels vertically (along the last axis) to create the RGB image
+d_image = np.stack((a_channel, b_channel, c_channel), axis=2)
+
+# Display the combined RGB image
+plt.imshow(d_image, aspect='auto')
+plt.title("Combined RGB Image (Horizontal Stripes)")
+plt.show()
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2. Image Rotation
+
+Code:
+ 
+
+
+# 1. Importing Libraries
+import numpy as np           	# Library for numerical operations
+import matplotlib.pyplot as plt  # Library for plotting
+import math                  	# Library for mathematical functions
+from PIL import Image        	# Python Imaging Library for image manipulation
+
+# 2. Loading the Original Image
+image_path = "/home/ani/Desktop/test.png"
+original_image = Image.open(image_path)
+
+# Convert image to numpy array
+original_array = np.array(original_image)
+
+# 3. Transformation Matrix and Applying Transformation
+# Transformation matrix for rotation by 30 degrees
+theta = math.radians(30)    	# Convert angle to radians
+cos_theta = math.cos(theta) 	# Compute cosine of angle
+sin_theta = math.sin(theta) 	# Compute sine of angle
+
+# Define transformation matrix for 2D rotation
+t = np.array([[cos_theta, -sin_theta, 0],
+          	[sin_theta, cos_theta, 0],
+          	[0, 0, 1]])
+
+# Getting the size of the image
+height, width, channels = original_array.shape
+
+# Calculate new image size after rotation
+new_height = int(abs(width * sin_theta) + abs(height * cos_theta))
+new_width = int(abs(height * sin_theta) + abs(width * cos_theta))
+
+# Initializing a transformed image array
+transformed_image = np.zeros((new_height, new_width, channels), dtype=np.uint8)
+
+# Applying the transformation to each pixel in the image
+for x in range(height):
+	for y in range(width):
+    	# Calculate new coordinates after rotation using transformation matrix
+    	new_x = int(x * cos_theta - y * sin_theta)
+    	new_y = int(x * sin_theta + y * cos_theta)
+
+    	# Ensure new coordinates are within bounds
+    	if 0 <= new_x < new_height and 0 <= new_y < new_width:
+        	transformed_image[new_x, new_y, :] = original_array[x, y, :]
+
+# Convert transformed image back to PIL Image
+transformed_image_pil = Image.fromarray(transformed_image)
+
+# 4. Visualizing Original and Transformed Images
+# Visualizing the original and transformed images using matplotlib
+plt.figure(figsize=(10, 5))
+
+plt.subplot(1, 2, 1)
+plt.title('Original Image')
+plt.imshow(original_array)
+plt.axis('off')
+
+plt.subplot(1, 2, 2)
+plt.title('Transformed Image')
+plt.imshow(transformed_image_pil)
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+Output:
+
+
+
+3.  Image Translation
+
+Code:
+
+import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
+
+# Load the original image
+image_path = "/home/ani/Desktop/test.png"
+original_image = Image.open(image_path)
+
+# Convert image to numpy array
+original_array = np.array(original_image)
+
+# Define translation parameters (shift in x and y directions)
+shift_x = 50
+shift_y = 30
+
+# Determine the size of the original image
+height, width, channels = original_array.shape
+
+# Create an empty array for the translated image
+translated_image = np.zeros_like(original_array)
+
+# Perform image translation manually
+for x in range(height):
+	for y in range(width):
+    	new_x = x + shift_x
+    	new_y = y + shift_y
+   	 
+    	# Check if the new coordinates are within bounds of the translated image
+    	if 0 <= new_x < height and 0 <= new_y < width:
+        	translated_image[new_x, new_y, :] = original_array[x, y, :]
+
+# Convert translated image back to PIL Image
+translated_image_pil = Image.fromarray(translated_image)
+
+# Visualize the original and translated images
+plt.figure(figsize=(10, 5))
+
+plt.subplot(1, 2, 1)
+plt.title('Original Image')
+plt.imshow(original_array)
+plt.axis('off')
+
+plt.subplot(1, 2, 2)
+plt.title('Translated Image')
+plt.imshow(translated_image_pil)
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
+Output:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4. Image Scaling
+
+Code:
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Create a 3-channel RGB image manually
+image_size = 100
+image = np.zeros((image_size, image_size, 3), dtype=np.uint8)
+
+# Draw a green square in the center
+center_x, center_y = image_size // 2, image_size // 2
+side_length = 30
+half_side = side_length // 2
+image[center_x - half_side:center_x + half_side,
+  	center_y - half_side:center_y + half_side,
+  	1] = 255  # Green channel set to 255 (full green)
+
+# Display the original image
+plt.figure(figsize=(6, 6))
+plt.title('Original Image')
+plt.imshow(image)
+plt.axis('off')
+plt.show()
+
+# Define scaling factors
+scale_x = 1.5  # Scale factor in the x-direction
+scale_y = 0.7  # Scale factor in the y-direction
+
+# Determine the size of the original image
+height, width, channels = image.shape
+
+# Calculate new dimensions after scaling
+new_height = int(height * scale_y)
+new_width = int(width * scale_x)
+
+# Initialize an array for the scaled image
+scaled_image = np.zeros((new_height, new_width, channels), dtype=np.uint8)
+
+# Perform image scaling manually
+for x in range(new_height):
+	for y in range(new_width):
+    	# Calculate corresponding coordinates in the original image
+    	orig_x = int(x / scale_y)
+    	orig_y = int(y / scale_x)
+   	 
+    	# Copy pixel value to scaled image if within original bounds
+    	if 0 <= orig_x < height and 0 <= orig_y < width:
+        	scaled_image[x, y, :] = image[orig_x, orig_y, :]
+
+# Display the scaled image
+plt.figure(figsize=(6, 6))
+plt.title('Scaled Image')
+plt.imshow(scaled_image)
+plt.axis('off')
+plt.show()
+
+
+Output:
+
+
+
+
+
+5. Histogram
+
+Code:
+
+import numpy as np
+import matplotlib.pyplot as plt
+from PIL import Image
+
+def calculate_histogram(image_array):
+	# Initialize an array to store histogram values (bins range 0-255)
+	histogram = np.zeros(256, dtype=int)
+
+	# Iterate through each pixel value in the image array and count occurrences
+	for pixel_value in image_array.flatten():
+    	histogram[pixel_value] += 1
+
+	return histogram
+
+def plot_image_and_histogram(image_path):
+	# Read the image
+	image = Image.open(image_path)
+
+	# Convert image to grayscale if it's not already
+	if image.mode != 'L':
+    	image = image.convert('L')
+
+	# Convert image to numpy array
+	image_array = np.array(image)
+
+	# Display the image
+	fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+	ax1.imshow(image_array, cmap='gray')
+	ax1.set_title('Image')
+	ax1.axis('off')
+
+	# Calculate the histogram
+	hist_values = calculate_histogram(image_array)
+
+	# Plot the histogram
+	ax2.plot(hist_values, color='blue')
+	ax2.set_title('Image Histogram')
+	ax2.set_xlabel('Pixel Value')
+	ax2.set_ylabel('Frequency')
+
+	# Display plot
+	plt.show()
+
+# Specify the path to the image
+image_path = "/home/ani/Desktop/test.png"
+
+# Plot image and histogram
+plot_image_and_histogram(image_path)
+
+
+
+
+
+
+
+
+
+
+
+
+
+Output:
